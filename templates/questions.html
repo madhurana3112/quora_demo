@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Questions and Answers</title>
+</head>
+<body>
+    {% if request.user.is_authenticated %}
+        <a href="/logout"><button>logout</button></a>
+    {% else %}
+    <a href="/registration"><button>Register</button></a>        /<a href="/login/"><button>Login</button></a>
+    {% endif %}
+    <h5>Ask a Question</h5>
+    <form method="post" action="{% url 'post_question' %}">
+        {% csrf_token %}
+        <textarea name="text" rows="4" cols="50" placeholder="Your question..."></textarea>
+        <br>
+        <input type="submit" value="Submit"><br>
+    </form>
+
+    {% for question in questions %}
+    <div class="question">
+        <label>Questions: {{ question.text }} --Posted by: {{ question.user.username }}</label>
+        <h4>Answers</h4>
+        {% for answer in answers %}
+        {% if answer.question_id == question.id %}
+        <div class="answer">
+            <label>{{ answer.text }} --Answered by: {{ answer.user.username }}
+                {% for key, value in likes.items  %}
+                {% if key == answer.id %}
+                Likes: {{ value }}
+                {% endif %}
+                {% endfor %}
+        </label>
+            <form method="post" action="{% url 'like_answer' answer.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Like">
+            </form>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <form method="post" action="{% url 'post_answer' question.id %}">
+            {% csrf_token %}
+            <textarea name="text" rows="4" cols="50" placeholder="Your answer..."></textarea>
+            <br>
+            <input type="submit" value="Submit Answer">
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>
